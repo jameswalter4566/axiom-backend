@@ -45,6 +45,9 @@ const proxyMiddleware = createProxyMiddleware({
     proxyReq.setHeader('Origin', TARGET_URL);
     proxyReq.setHeader('Referer', `${TARGET_URL}/`);
 
+    // Request uncompressed content so we can modify it
+    proxyReq.setHeader('Accept-Encoding', 'identity');
+
     // Remove identifying headers
     proxyReq.removeHeader('x-forwarded-for');
     proxyReq.removeHeader('x-forwarded-host');
