@@ -4,7 +4,9 @@ const http = require('http');
 
 // WebSocket subdomain routing
 const WS_ROUTES = {
+  // Socket
   '/ws/socket8': 'socket8.axiom.trade',
+  // Cluster subdomains
   '/ws/cluster2': 'cluster2.axiom.trade',
   '/ws/cluster3': 'cluster3.axiom.trade',
   '/ws/cluster4': 'cluster4.axiom.trade',
@@ -14,6 +16,14 @@ const WS_ROUTES = {
   '/ws/cluster8': 'cluster8.axiom.trade',
   '/ws/cluster9': 'cluster9.axiom.trade',
   '/ws/cluster-asia2': 'cluster-asia2.axiom.trade',
+  '/ws/cluster-gcp-asia1': 'cluster-gcp-asia1.axiom.trade',
+  '/ws/cluster-gcp-aus1': 'cluster-gcp-aus1.axiom.trade',
+  // Eucalyptus (WebSocket clusters)
+  '/ws/eucalyptus': 'eucalyptus.axiom.trade',
+  '/ws/eucalyptus-bnb': 'eucalyptus-bnb.axiom.trade',
+  // Friends
+  '/ws/friends': 'friends.axiom.trade',
+  // Main
   '/ws/main': 'axiom.trade'
 };
 

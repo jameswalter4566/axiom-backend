@@ -34,7 +34,9 @@ app.get('/health', (req, res) => {
 
 // Subdomain API route mappings
 const SUBDOMAIN_ROUTES = {
+  // Translate
   '/translate': 'translate.axiom.trade',
+  // Cluster subdomains
   '/cluster/2': 'cluster2.axiom.trade',
   '/cluster/3': 'cluster3.axiom.trade',
   '/cluster/4': 'cluster4.axiom.trade',
@@ -44,10 +46,34 @@ const SUBDOMAIN_ROUTES = {
   '/cluster/8': 'cluster8.axiom.trade',
   '/cluster/9': 'cluster9.axiom.trade',
   '/cluster/asia2': 'cluster-asia2.axiom.trade',
+  '/cluster/gcp-asia1': 'cluster-gcp-asia1.axiom.trade',
+  '/cluster/gcp-aus1': 'cluster-gcp-aus1.axiom.trade',
+  // Socket
   '/socket8': 'socket8.axiom.trade',
+  // Reporting
   '/reporting': 'reporting.axiom.trade',
+  // Transaction
   '/tx-pro': 'tx-pro.axiom.trade',
-  '/tx-custom': 'tx-custom.axiom.trade'
+  '/tx-custom': 'tx-custom.axiom.trade',
+  // API endpoints
+  '/api': 'api.axiom.trade',
+  '/api1': 'api1.axiom.trade',
+  '/api2': 'api2.axiom.trade',
+  '/api3': 'api3.axiom.trade',
+  '/api4': 'api4.axiom.trade',
+  '/api5': 'api5.axiom.trade',
+  '/api6': 'api6.axiom.trade',
+  '/api7': 'api7.axiom.trade',
+  // BNB API endpoints
+  '/api1-bnb': 'api1-bnb.axiom.trade',
+  '/api2-bnb': 'api2-bnb.axiom.trade',
+  // Eucalyptus (WebSocket clusters)
+  '/eucalyptus': 'eucalyptus.axiom.trade',
+  '/eucalyptus-bnb': 'eucalyptus-bnb.axiom.trade',
+  // Friends
+  '/friends': 'friends.axiom.trade',
+  // Docs
+  '/docs': 'docs.axiom.trade'
 };
 
 // Create subdomain proxy handlers
