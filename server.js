@@ -32,6 +32,95 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ============================================
+// GMGN API PROXY ROUTES - For live token data
+// ============================================
+const GMGN_HOST = 'gmgn.ai';
+
+// GMGN trending tokens endpoint
+app.use('/gmgn', createProxyMiddleware({
+  target: `https://${GMGN_HOST}`,
+  changeOrigin: true,
+  pathRewrite: (path) => path.replace('/gmgn', ''),
+  onProxyReq: (proxyReq, req, res) => {
+    proxyReq.setHeader('Host', GMGN_HOST);
+    proxyReq.setHeader('Origin', `https://${GMGN_HOST}`);
+    proxyReq.setHeader('Referer', `https://${GMGN_HOST}/`);
+    proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+    proxyReq.removeHeader('x-forwarded-for');
+    proxyReq.removeHeader('x-forwarded-host');
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+    proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+    proxyRes.headers['Access-Control-Allow-Headers'] = '*';
+  },
+  onError: (err, req, res) => {
+    console.error('GMGN proxy error:', err.message);
+    res.status(500).json({ error: 'GMGN proxy error', message: err.message });
+  }
+}));
+console.log('Registered GMGN proxy route: /gmgn/* -> gmgn.ai/*');
+
+// Direct API endpoints for common GMGN data
+app.get('/data/trending', async (req, res) => {
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const period = req.query.period || '1h';
+    const response = await fetch(`https://gmgn.ai/defi/quotation/v1/rank/sol/swaps/${period}?orderby=swaps&direction=desc`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Origin': 'https://gmgn.ai',
+        'Referer': 'https://gmgn.ai/'
+      }
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error('Trending fetch error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/data/pump', async (req, res) => {
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch('https://gmgn.ai/defi/quotation/v1/rank/sol/pump?orderby=progress&direction=desc', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Origin': 'https://gmgn.ai',
+        'Referer': 'https://gmgn.ai/'
+      }
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error('Pump fetch error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/data/volume', async (req, res) => {
+  try {
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch('https://gmgn.ai/defi/quotation/v1/rank/sol/swaps/1h?orderby=volume&direction=desc', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Origin': 'https://gmgn.ai',
+        'Referer': 'https://gmgn.ai/'
+      }
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error('Volume fetch error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Subdomain API route mappings
 const SUBDOMAIN_ROUTES = {
   // Translate
