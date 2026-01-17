@@ -2,6 +2,21 @@ const WebSocket = require('ws');
 const https = require('https');
 const http = require('http');
 
+// WebSocket subdomain routing
+const WS_ROUTES = {
+  '/ws/socket8': 'socket8.axiom.trade',
+  '/ws/cluster2': 'cluster2.axiom.trade',
+  '/ws/cluster3': 'cluster3.axiom.trade',
+  '/ws/cluster4': 'cluster4.axiom.trade',
+  '/ws/cluster5': 'cluster5.axiom.trade',
+  '/ws/cluster6': 'cluster6.axiom.trade',
+  '/ws/cluster7': 'cluster7.axiom.trade',
+  '/ws/cluster8': 'cluster8.axiom.trade',
+  '/ws/cluster9': 'cluster9.axiom.trade',
+  '/ws/cluster-asia2': 'cluster-asia2.axiom.trade',
+  '/ws/main': 'axiom.trade'
+};
+
 /**
  * Setup WebSocket proxy to forward connections to Axiom
  */
@@ -10,15 +25,28 @@ function setupWebSocketProxy(server, targetHost) {
   server.on('upgrade', (request, socket, head) => {
     console.log(`WebSocket upgrade request: ${request.url}`);
 
+    // Determine target host based on URL path
+    let actualTargetHost = targetHost;
+    let actualPath = request.url;
+
+    for (const [route, host] of Object.entries(WS_ROUTES)) {
+      if (request.url.startsWith(route)) {
+        actualTargetHost = host;
+        actualPath = request.url.substring(route.length) || '/';
+        console.log(`Routing WebSocket to subdomain: ${host}`);
+        break;
+      }
+    }
+
     // Determine target WebSocket URL
-    const targetUrl = `wss://${targetHost}${request.url}`;
+    const targetUrl = `wss://${actualTargetHost}${actualPath}`;
     console.log(`Proxying WebSocket to: ${targetUrl}`);
 
     // Create connection to target WebSocket
     const targetWs = new WebSocket(targetUrl, {
       headers: {
-        'Host': targetHost,
-        'Origin': `https://${targetHost}`,
+        'Host': actualTargetHost,
+        'Origin': `https://${actualTargetHost}`,
         'User-Agent': request.headers['user-agent'] || 'Mozilla/5.0',
       },
       rejectUnauthorized: true

@@ -32,6 +32,52 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Subdomain API route mappings
+const SUBDOMAIN_ROUTES = {
+  '/translate': 'translate.axiom.trade',
+  '/cluster/2': 'cluster2.axiom.trade',
+  '/cluster/3': 'cluster3.axiom.trade',
+  '/cluster/4': 'cluster4.axiom.trade',
+  '/cluster/5': 'cluster5.axiom.trade',
+  '/cluster/6': 'cluster6.axiom.trade',
+  '/cluster/7': 'cluster7.axiom.trade',
+  '/cluster/8': 'cluster8.axiom.trade',
+  '/cluster/9': 'cluster9.axiom.trade',
+  '/cluster/asia2': 'cluster-asia2.axiom.trade',
+  '/socket8': 'socket8.axiom.trade',
+  '/reporting': 'reporting.axiom.trade',
+  '/tx-pro': 'tx-pro.axiom.trade',
+  '/tx-custom': 'tx-custom.axiom.trade'
+};
+
+// Create subdomain proxy handlers
+Object.entries(SUBDOMAIN_ROUTES).forEach(([route, subdomain]) => {
+  app.use(route, createProxyMiddleware({
+    target: `https://${subdomain}`,
+    changeOrigin: true,
+    pathRewrite: (path) => path.replace(route, '') || '/',
+    onProxyReq: (proxyReq, req, res) => {
+      proxyReq.setHeader('Host', subdomain);
+      proxyReq.setHeader('Origin', `https://${subdomain}`);
+      proxyReq.setHeader('Referer', `https://${subdomain}/`);
+      proxyReq.removeHeader('x-forwarded-for');
+      proxyReq.removeHeader('x-forwarded-host');
+      proxyReq.removeHeader('x-forwarded-proto');
+      proxyReq.removeHeader('x-real-ip');
+    },
+    onProxyRes: (proxyRes, req, res) => {
+      proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+      proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+      proxyRes.headers['Access-Control-Allow-Headers'] = '*';
+    },
+    onError: (err, req, res) => {
+      console.error(`Proxy error for ${subdomain}:`, err.message);
+      res.status(500).json({ error: 'Proxy error', message: err.message });
+    }
+  }));
+  console.log(`Registered subdomain route: ${route} -> ${subdomain}`);
+});
+
 // Proxy middleware configuration
 const proxyMiddleware = createProxyMiddleware({
   target: TARGET_URL,
