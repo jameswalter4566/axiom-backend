@@ -64,6 +64,9 @@ const SUBDOMAIN_ROUTES = {
   '/api5': 'api5.axiom.trade',
   '/api6': 'api6.axiom.trade',
   '/api7': 'api7.axiom.trade',
+  '/api8': 'api8.axiom.trade',
+  '/api9': 'api9.axiom.trade',
+  '/api10': 'api10.axiom.trade',
   // BNB API endpoints
   '/api1-bnb': 'api1-bnb.axiom.trade',
   '/api2-bnb': 'api2-bnb.axiom.trade',
